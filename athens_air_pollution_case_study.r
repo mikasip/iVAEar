@@ -103,13 +103,13 @@ variables <- c("Wind.Speed..U.", "Wind.Speed..V.", "Dewpoint.Temp", "Soil.Temp",
 seas_var_names <- sapply(variables, function(name) paste0(name, "_seas"))
 res_var_names <- sapply(variables, function(name) paste0(name, "_res"))
 
-data_full_train <- read.csv("athens_daily_train.csv")
+data_full_train <- read.csv("data/athens_daily_train.csv")
 head(data_full_train)
-data_full_test <- read.csv("athens_daily_test.csv")
-coords_time_train <- read.csv("athens_coords_train.csv")
+data_full_test <- read.csv("data/athens_daily_test.csv")
+coords_time_train <- read.csv("data/athens_coords_train.csv")
 head(coords_time_train)
 coords_time_train <- coords_time_train[, 2:4]
-coords_time_test <- read.csv("athens_coords_test.csv")
+coords_time_test <- read.csv("data/athens_coords_test.csv")
 coords_time_test <- coords_time_test[, 2:4]
 head(coords_time_train)
 

@@ -12,6 +12,13 @@ This repository contains the code and supplementary materials for reproducing th
 └── README.md                               # This file
 ```
 
+## Dependencies
+
+The main methods are in R package ```NonlinearBSS```. To ensure that the right versions of the methods are used for reproducing the results, the package can be downloaded in R as follows:
+```
+devtools::install_github("mikasip/NonlinearBSS@4e3e8e3c94b9858a6b467c1e965f9f6f7da470bd")
+```
+
 ## Data
 
 For the original data used in the case study, see [1].

@@ -53,7 +53,7 @@ fit_product_sum <- function(vv, res_var, verbose = FALSE) {
     class(vv_s) <- c("gstatVariogram", "data.frame")
     vg_s <- fit.variogram(vv_s, vgm(0.3, c("Sph"), 10000))
     if (verbose) {
-        vg_s
+        print(vg_s)
         plot(x = vv_s_temp$spacelag, y = vv_s_temp$gamma, main = "Spatial variogram", pch = 19)
     }
     vgm_s <- vgm(
@@ -69,16 +69,15 @@ fit_product_sum <- function(vv, res_var, verbose = FALSE) {
 
     # compute the k parameter for the PRODUCT-SUM MODEL
     sillT <- res_var - vg_t$psill[1] # c00-sillsp
-    if (sillT < 0) sillT <- 0.01
     sillS <- res_var - vg_s$psill[1] # c00-sillt
-    # k=(sillST-sillS-sillT)/(sillS*sillT)
+    k <- max((res_var - sillS - sillT) / (sillS * sillT), 0.0001)
     print(sillT)
     print(sillS)
-    k <- abs((res_var - sillS - sillT) / (sillS * sillT))
     print(k)
 
     # fit the PRODUCT-SUM MODEL
-    vgm_prodSum_model <- vgmST("productSum", space = vgm_s, time = vgm_t, k = k)
+    vgm_prodSum_model <- vgmST("productSum", space = vgm_s, time = vgm_t, k = k, lower = c(0, 
+                0.01, 0, 0, 0.01, 0, sqrt(.Machine$double.eps)))
 
     vgm_prodSum_fit <- fit.StVariogram(vv, vgm_prodSum_model)
 
@@ -277,7 +276,8 @@ for (station in unique(data_full_train$station_name)) {
 }
 
 # KRIGING
-
+stfdf_validation_time <- create_st_dataset(data_full_test, variables, length(unique(coords_time_test$Date_numeric)))
+n_t_train <- length(unique(data_full_train$Date_numeric))
 for (var_name in res_var_names) {
     var_df <- data_full_train[, c("station_name", "X_cent", "Y_cent", "Date_numeric", "Date", var_name)]
     names(var_df) <- c("station_name", "X_cent", "Y_cent", "Date_numeric", "Date", "var")
@@ -300,11 +300,6 @@ for (var_name in res_var_names) {
 }
 
 pred_obs_time <- data_full_test[, res_var_names] + data_full_test[, seas_var_names]
-pred_obs_time_scaled <- sweep(pred_obs_time, 2, sds_test_time, "/")
 
-mse_pred_time <- apply((data_full_test[, ] - pred_obs_time)^2, 2, mean)
-mse_pred_time
-xtable(rbind(mse_time_aux, mse_pred_time, arima_mse))
-mse_time_aux
+mse_pred_time <- apply((data_full_test[, variables] - pred_obs_time)^2, 2, mean)
 mean(mse_pred_time/sds^2)
-mean(mse_time_aux/sds^2)
